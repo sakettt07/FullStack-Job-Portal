@@ -3,6 +3,7 @@ import  {config} from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./database/db.js";
+import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app=express();
 config({path:"./config/config.env"});
@@ -18,5 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 
 connectDB();
+
+
+app.use(errorMiddleware);
 
 export default app;
