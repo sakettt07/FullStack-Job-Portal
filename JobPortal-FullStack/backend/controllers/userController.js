@@ -1,6 +1,6 @@
 import {User} from "../models/user.model.js";
 import {catchAsyncErrors} from "../middlewares/catchAsync.middleware.js";
-import ErrorHandler, { errorMiddleware } from "../middlewares/error.middleware.js";
+import ErrorHandler from "../middlewares/error.middleware.js";
 import {v2 as cloudinary} from "cloudinary";
 import {sendToken} from "../utils/JwtToken.js"
 
@@ -68,6 +68,46 @@ const registerUser=catchAsyncErrors(async(req,res,next)=>{
 })
 
 const loginUser=catchAsyncErrors(async(req,res,next)=>{
-    
+    // TODO: get the essentials from the body
+    // then find it in the Database.
+    // convert the password and match
+    // if the user is present then return logged in and change the page 
+    // saved his cookie for the seesion user accessing the site.
+    try {
+        const {email,password,role}=req.body;
+        if(!email ||!password||!role){
+            return next(
+                new ErrorHandler("Email, password ,role are required.",400)
+            );
+        }
+        const user=await User.findOne({email}).select("+password");
+        if(!user){
+            return next(new ErrorHandler("Invalid email or password",400));
+        }
+        const isPasswordMatch=await user.isPasswordCorrect(password);
+        if(!isPasswordMatch){
+            return next(new ErrorHandler("Invalid password",400))
+        }
+        if(user.role!==role){
+            return next(new ErrorHandler("Invalid User role",400))
+        }
+        sendToken(user,200,res,"User logged in successfully");
+    } catch (error) {
+        console.log(error)
+        
+    }
 })
-export {registerUser};
+
+const logoutUser=catchAsyncErrors(async(req,res,next)=>{
+    res.status(200).cookie("token","",{
+        expires:new Date(Date.now()),
+        httpOnly:true,
+    }).json({
+        success:true,
+        message:"Logged Out successfully."
+    })
+})
+const getUser=catchAsyncErrors(async(req,res,next)=>{
+
+})
+export {registerUser,loginUser,logoutUser,getUser};
