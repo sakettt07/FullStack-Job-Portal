@@ -1,7 +1,7 @@
-import express from "express";
+import express,{urlencoded} from "express";
 import  {config} from "dotenv";
 import cors from "cors";
-import cookieParser from "cookie-parser";
+import cookie_parser from "cookie-parser";
 import { connectDB } from "./database/db.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import fileUpload from "express-fileupload";
@@ -16,9 +16,9 @@ app.use(cors({
     credentials:true,
 }))
 
-app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(cookie_parser());
 
 app.use(fileUpload({
     useTempFiles:true,
@@ -32,4 +32,4 @@ connectDB();
 
 app.use(errorMiddleware);
 
-export default app;
+export {app};

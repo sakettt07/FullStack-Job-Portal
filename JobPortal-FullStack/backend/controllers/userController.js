@@ -122,7 +122,7 @@ const loginUser = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-const logoutUser = catchAsyncErrors(async (req, res, next) => {
+const logoutUser = catchAsyncErrors(async (req, res) => {
   res
     .status(200)
     .cookie("token", "", {
