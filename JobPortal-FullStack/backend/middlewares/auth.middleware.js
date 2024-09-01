@@ -5,22 +5,23 @@ import { User } from "../models/user.model.js";
 
 export const verifyJWT =catchAsyncErrors(async(req,res,next)=>{
     try {
-        console.log("cookies",req.cookies);
-        const{token}=req.cookies;
+        const {token}=req.cookies;
         if(!token){
             return next(new ErrorHandler("Unauthorized request",400));
         }
         //  ab hume token mil chuka h toh jwt s use decode karana h nad verify
         const decodedToken=jwt.verify(token,process.env.JWT_SECRET_KEY);
-        const user=await User.findById(decodedToken?._id).select("-password -refreshToken");
+        const user=await User.findById(decodedToken.id);
         if(!user){
-            return next(new ErrorHandler("Invalid or expired token", 401));
+            console.error("User not found for decoded token:", decodedToken);
+        return next(new ErrorHandler("Invalid or expired token", 401));
 
         }
         req.user=user;
         next();
     } catch (error) {
-        console.log(error)
+        console.error("Error in token verification:", error);
+    next(new ErrorHandler("Unauthorized request", 401));
         
     }
 })

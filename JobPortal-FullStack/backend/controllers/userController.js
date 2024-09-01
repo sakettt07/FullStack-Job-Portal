@@ -2,7 +2,7 @@ import { User } from "../models/user.model.js";
 import { catchAsyncErrors } from "../middlewares/catchAsync.middleware.js";
 import ErrorHandler from "../middlewares/error.middleware.js";
 import { v2 as cloudinary } from "cloudinary";
-import { sendToken } from "../utils/JwtToken.js";
+import { sendToken } from "../utils/jwtToken.js";
 
 const registerUser = catchAsyncErrors(async (req, res, next) => {
   // TODO:
@@ -116,6 +116,7 @@ const loginUser = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Invalid User role", 400));
     }
     sendToken(user, 200, res, "User logged in successfully");
+    // console.log(user)
   } catch (error) {
     console.log(error);
   }
