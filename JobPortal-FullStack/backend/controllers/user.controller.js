@@ -199,7 +199,7 @@ const updatePassword = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
   const { newPassword, confirmPassword } = req.body;
 
-  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+  const isPasswordMatched = await user.isPasswordCorrect(req.body.oldPassword);
 
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Old password is incorrect.", 400));

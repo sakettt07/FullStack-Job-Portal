@@ -6,7 +6,7 @@ import {
   getUser,
   updateUserDetails,
   updatePassword,
-} from "../controllers/userController.js";
+} from "../controllers/user.controller.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
