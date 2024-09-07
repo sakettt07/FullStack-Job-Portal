@@ -2,9 +2,9 @@ import { User } from "../models/user.model.js";
 import { catchAsyncErrors } from "../middlewares/catchAsync.middleware.js";
 import ErrorHandler from "../middlewares/error.middleware.js";
 import { v2 as cloudinary } from "cloudinary";
-import { sendToken } from "../utils/jwtToken.js";
 import { Job } from "../models/job.model.js";
 
+// the employer can create a new job
 const postJob = catchAsyncErrors(async (req, res, next) => {
   try {
     const {
@@ -30,11 +30,7 @@ const postJob = catchAsyncErrors(async (req, res, next) => {
       !introduction ||
       !qualifications ||
       !responsibilities ||
-      !offers ||
       !salary ||
-      !personalWebsite ||
-      !hiringMultipleCandidates ||
-      !newsLettersSent ||
       !jobNiche
     ) {
       return next(
@@ -110,4 +106,84 @@ const postJob = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-export { postJob };
+// the employer can delete the job he has posted
+
+const deleteJob = catchAsyncErrors(async (req, res, next) => {
+  // TODO: Firstly get the user from the userLoggedIn cookie if employee then only he can access this route.
+  // then get the job id from the params and find it in the DB and get it delete
+  try {
+    const { id } = req.params;
+    const job = await Job.findByIdAndDelete(id);
+    if (!job) {
+      return next(new ErrorHandler("Oops! Job not found.", 404));
+    }
+    res.status(200).json({
+      success: true,
+      message: "Job deleted.",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// To get all the job on the frontend. with proper searching technique using the query method.
+const getAllJobs = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { city, niche, searchKeyword } = req.query;
+    const query = {};
+    if (city) {
+      query.location = city;
+    }
+    if (niche) {
+      query.jobNiche = niche;
+    }
+    if (searchKeyword) {
+      query.$or = [
+        { title: { $regex: searchKeyword, $options: "i" } },
+        { companyName: { $regex: searchKeyword, $options: "i" } },
+        { introduction: { $regex: searchKeyword, $options: "i" } },
+      ];
+    }
+    const jobs = await Job.find(query);
+    res.status(200).json({
+      success: true,
+      jobs,
+      count: jobs.length,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+// To get a single job
+const getASingleJob = catchAsyncErrors(async (req, res, next) => {
+  // TODO:
+
+  try {
+    const { id } = req.params;
+    const job = await Job.findById(id);
+    if (!job) {
+      return next(new ErrorHandler("Job not found.", 404));
+    }
+    res.status(200).json({
+      success: true,
+      job,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Employer can get all his jobs
+const getMyJobs = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const myJobs = await Job.find({ postedBy: req.user._id });
+    res.status(200).json({
+      success: true,
+      myJobs,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export { postJob, deleteJob, getASingleJob, getMyJobs, getAllJobs };
