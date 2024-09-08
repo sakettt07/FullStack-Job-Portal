@@ -107,7 +107,6 @@ const postJob = catchAsyncErrors(async (req, res, next) => {
 });
 
 // the employer can delete the job he has posted
-
 const deleteJob = catchAsyncErrors(async (req, res, next) => {
   // TODO: Firstly get the user from the userLoggedIn cookie if employee then only he can access this route.
   // then get the job id from the params and find it in the DB and get it delete
