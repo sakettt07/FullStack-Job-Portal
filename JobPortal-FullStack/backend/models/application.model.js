@@ -4,10 +4,6 @@ import validator from "validator";
 
 const applicationSchema = new mongoose.Schema({
   jobSeekerInfo: {
-    id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
