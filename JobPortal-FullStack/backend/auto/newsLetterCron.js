@@ -7,8 +7,8 @@ import { sendEmail } from "../utils/sendEmail.js";
 // used chatGPT / npmjs for understanding the cron package.
 export const newsLetterCron=()=>{
     cron.schedule('*/1 * * * *',async()=>{    // the expression is space sensitive so...
-        // console.log("Chal raha h Cron Automation");
-        const job=await Job.find({newsLettersSent:false});
+        console.log("Chal raha h Cron Automation");
+        const jobs=await Job.find({newsLettersSent:false});
         for(const job of jobs){
             try{
                 const filteredUsers=await User.find({

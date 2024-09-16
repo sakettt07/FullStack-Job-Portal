@@ -1,4 +1,4 @@
-import express,{urlencoded} from "express";
+import express from "express";
 import  {config} from "dotenv";
 import cors from "cors";
 import cookie_parser from "cookie-parser";
@@ -32,7 +32,7 @@ app.use("/api/v1/user",userRouter);
 app.use("/api/v1/job/",jobRouter);
 app.use("/api/v1/application/",applicationRouter);
 
-// newsLetterCron();
+newsLetterCron();
 
 connectDB();
 
