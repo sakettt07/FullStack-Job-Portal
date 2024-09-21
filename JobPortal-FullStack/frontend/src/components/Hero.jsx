@@ -49,6 +49,8 @@ const Hero = () => {
           alt=""
           className="absolute bottom-auto left-auto right-0 top-0 -z-10 hidden sm:inline-block"
         />
+        {/* infinte carousel */}
+        
       </section>
     </>
   );
