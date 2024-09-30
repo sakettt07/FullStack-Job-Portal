@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Lenis from "lenis";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -12,7 +12,12 @@ import DashBoard from "./pages/DashBoard";
 import PostApplication from "./pages/PostApplication";
 import NotFound from "./pages/NotFound";
 
-const App = () => {
+const AppContent = () => {
+  const location = useLocation();
+  const isNotFoundPage = location.pathname !== "/" &&
+    !(["/register", "/login", "/jobs", "/dashboard"].includes(location.pathname)) &&
+    !location.pathname.startsWith("/post/application/");
+
   useEffect(() => {
     const lenis = new Lenis();
 
@@ -26,26 +31,36 @@ const App = () => {
     }
 
     requestAnimationFrame(raf);
-  },[]);
+  }, []);
+
+  if (isNotFoundPage) {
+    return <NotFound />;
+  }
+
   return (
     <>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/dashboard" element={<DashBoard />} />
-          <Route
-            path="/post/application/:jobId"
-            element={<PostApplication />}
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
-      </Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/dashboard" element={<DashBoard />} />
+        <Route
+          path="/post/application/:jobId"
+          element={<PostApplication />}
+        />
+      </Routes>
+      <Footer />
     </>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 };
 
