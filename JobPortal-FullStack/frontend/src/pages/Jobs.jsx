@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearAllErrors, fetchJobs } from "../store/slices/jobSlices";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
-import { cityData, jobPositions } from "../assets/data.js";
+import { cityData, jobPositions, randomJobs } from "../assets/data.js";
+import { Link } from "react-router-dom";
+import ReactPaginate from 'react-paginate';
 
 const Jobs = () => {
   const [city, setCity] = useState("");
@@ -11,6 +13,8 @@ const Jobs = () => {
   const [niche, setNiche] = useState("");
   const [selectedNiche, setSelectedNiche] = useState();
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [jobsPerPage] = useState(6);
 
   const { jobs, loading, error } = useSelector((state) => state.jobs);
 
@@ -35,6 +39,15 @@ const Jobs = () => {
 
   const handleSearch = () => {
     dispatch(fetchJobs(city, niche, searchKeyword));
+  };
+
+  // Pagination logic
+  const offset = currentPage * jobsPerPage;
+  const currentJobs = randomJobs.slice(offset, offset + jobsPerPage);
+  const pageCount = Math.ceil(randomJobs.length / jobsPerPage);
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
   };
 
   return (
@@ -74,7 +87,9 @@ const Jobs = () => {
                 checked={selectedCity === city}
                 onChange={() => handleCityChange(city)}
               />
-              <label htmlFor={city} className="ml-2">{city}</label>
+              <label htmlFor={city} className="ml-2">
+                {city}
+              </label>
             </div>
           ))}
           <h2 className="text-xl font-semibold mt-6 mb-4">Filter by Niche</h2>
@@ -88,7 +103,9 @@ const Jobs = () => {
                 checked={selectedNiche === niche}
                 onChange={() => handleNicheChange(niche)}
               />
-              <label htmlFor={niche} className="ml-2">{niche}</label>
+              <label htmlFor={niche} className="ml-2">
+                {niche}
+              </label>
             </div>
           ))}
         </div>
@@ -128,23 +145,82 @@ const Jobs = () => {
         </div>
 
         {/* Jobs Section */}
-        <div className="w-full md:w-full bg-red-200 p-4 rounded-lg shadow-lg min-h-[200px]">
-  {loading ? (
-    <div className="flex justify-center items-center h-full">
-      <Spinner />
-    </div>
-  ) : (
-    <div>
-      {/* Map through jobs and render them */}
-      {jobs&&jobs.map((element) => (
-        <div className="job-card " key={element._id}>{
-          
-        }
+        <div className="w-full md:w-[80%] bg-red-200 p-4 rounded-lg shadow-lg min-h-[200px]">
+          {!loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {currentJobs.map((element) => (
+                  <div
+                    className="bg-white shadow-md rounded-lg p-6 flex flex-col justify-between hover:shadow-lg transition-shadow duration-300 ease-in-out"
+                    key={element._id}
+                  >
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      {element.title}
+                    </h3>
+                    <p className="text-gray-700 mb-1">
+                      <span className="font-medium">Company: </span>
+                      {element.companyName}
+                    </p>
+                    <p className="text-gray-600 mb-4">
+                      <span className="font-medium">Location: </span>
+                      {element.location}
+                    </p>
+                    <p className="text-gray-700 mb-4">
+                      <span className="font-medium">Salary: </span>₹
+                      {element.salary}
+                    </p>
+                    <p
+                      className={`${
+                        element.hiringMultipleCandidates === "Yes"
+                          ? "text-green-600"
+                          : "text-yellow-600"
+                      } font-medium mb-4`}
+                    >
+                      {element.hiringMultipleCandidates === "Yes"
+                        ? "Hiring Multiple Candidates"
+                        : "Hiring"}
+                    </p>
+                    <p className="text-gray-500 text-sm mb-6">
+                      <span className="font-medium">Posted On: </span>
+                      {element.jobPostedOn.substring(0, 10)}
+                    </p>
+                    <div className="flex justify-center">
+                      <Link
+                        to={`/post/application/${element._id}`}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300"
+                      >
+                        Apply Now
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <ReactPaginate
+                previousLabel={'previous'}
+                nextLabel={'next'}
+                breakLabel={'...'}
+                pageCount={pageCount}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageClick}
+                containerClassName={'pagination flex justify-center mt-8 space-x-2'}
+                pageClassName={'bg-white border rounded px-3 py-1'}
+                pageLinkClassName={'text-blue-500'}
+                activeClassName={'bg-blue-500'}
+                activeLinkClassName={'text-black'}
+                previousClassName={'bg-white border rounded px-3 py-1'}
+                nextClassName={'bg-white border rounded px-3 py-1'}
+                previousLinkClassName={'text-blue-500'}
+                nextLinkClassName={'text-blue-500'}
+                disabledClassName={'text-gray-300'}
+              />
+            </>
+          )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
       </div>
     </>
   );
