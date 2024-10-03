@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearAllErrors, fetchJobs } from "../store/slices/jobSlices";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
-import { cityData, jobPositions, randomJobs } from "../assets/data.js";
+import { cityData, jobPositions } from "../assets/data.js";
 import { Link } from "react-router-dom";
 import ReactPaginate from 'react-paginate';
 
@@ -43,8 +43,8 @@ const Jobs = () => {
 
   // Pagination logic
   const offset = currentPage * jobsPerPage;
-  const currentJobs = randomJobs.slice(offset, offset + jobsPerPage);
-  const pageCount = Math.ceil(randomJobs.length / jobsPerPage);
+  const currentJobs = jobs.slice(offset, offset + jobsPerPage);
+  const pageCount = Math.ceil(jobs.length / jobsPerPage);
 
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
@@ -145,8 +145,8 @@ const Jobs = () => {
         </div>
 
         {/* Jobs Section */}
-        <div className="w-full md:w-[80%] bg-red-200 p-4 rounded-lg shadow-lg min-h-[200px]">
-          {!loading ? (
+        <div className="w-full md:w-[80%] bg-zinc-900 p-4 rounded-lg shadow-lg min-h-[200px]">
+          {loading ? (
             <div className="flex justify-center items-center h-full">
               <Spinner />
             </div>
@@ -208,10 +208,10 @@ const Jobs = () => {
                 pageRangeDisplayed={5}
                 onPageChange={handlePageClick}
                 containerClassName={'pagination flex justify-center mt-8 space-x-2'}
-                pageClassName={'bg-white border rounded px-3 py-1'}
-                pageLinkClassName={'text-blue-500'}
-                activeClassName={'bg-blue-500'}
-                activeLinkClassName={'text-black'}
+                pageClassName={'border rounded px-3 py-1'}
+                pageLinkClassName={'text-white'}
+                activeClassName={'bg-black border-2'}
+                activeLinkClassName={'text-black  bg-black p-1 px-3'}
                 previousClassName={'bg-white border rounded px-3 py-1'}
                 nextClassName={'bg-white border rounded px-3 py-1'}
                 previousLinkClassName={'text-blue-500'}
