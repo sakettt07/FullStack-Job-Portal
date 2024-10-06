@@ -1,75 +1,76 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const jobSlice=createSlice({
-    name:"jobs",
-    initialState:{
-        jobs:[],
-        loading:false,
-        error:null,
-        message:null,
-        singleJob:{},
-        myJobs:[]
+const jobSlice = createSlice({
+    name: "jobs",
+    initialState: {
+        jobs: [],
+        loading: false,
+        error: null,
+        message: null,
+        singleJob: {},
+        myJobs: []
     },
-    reducers:{
-        requestForAllJobs(state,action){
-            state.loading=true;
-            state.error=null;
+    reducers: {
+        requestForAllJobs(state) {
+            state.loading = true;
+            state.error = null;
         },
-        successForAllJobs(state,action){
-            state.loading=false;
-            state.jobs=action.payload
+        successForAllJobs(state, action) {
+            state.loading = false;
+            state.jobs = action.payload;
         },
-        failureForAllJobs(state,action){
-            state.loading=false;
-            state.jobs=action.payload
+        failureForAllJobs(state, action) {
+            state.loading = false;
+            state.error = action.payload;
         },
-        clearAllErrors(state,action){
-            state.error=null;
-            state.jobs=state.jobs;
+        clearAllErrors(state) {
+            state.error = null;
         },
-        resetJobSlice(state,action){
-            state.error=null;
-            state.jobs=state.jobs;
-            state.loading=false;
-            state.message=null;
-            state.myJobs=state.myJobs;
-            state.singleJob={}
+        resetJobSlice(state) {
+            state.error = null;
+            state.loading = false;
+            state.message = null;
+            state.singleJob = {};
         }
     }
 });
 
-export const fetchJobs=(city,niche,searchKeyword="")=>async(dispatch)=>{
+export const fetchJobs = (city = "", niche = "", searchKeyword = "") => async (dispatch) => {
     try {
         dispatch(jobSlice.actions.requestForAllJobs());
-        let link="http://localhost:4000/api/v1/job/getall?";
-        let queryParams=[];
-        if(searchKeyword){
-            queryParams.push(`searchkeyword=${searchKeyword}`)
+        
+        // Prepare search parameters
+        const searchParams = new URLSearchParams();
+        
+        // Handle comma-separated search terms
+        if (searchKeyword) {
+            const searchTerms = searchKeyword.split(',').map(term => term.trim()).filter(Boolean);
+            if (searchTerms.length > 0) {
+                searchParams.append('keywords', searchTerms.join(','));
+            }
         }
-        if(city){
-            queryParams.push(`city=${city}`)
+        
+        if (city) {
+            searchParams.append('city', city);
         }
-        if(niche){
-            queryParams.push(`niche=${niche}`);
+        
+        if (niche) {
+            searchParams.append('niche', niche);
         }
-
-        link+=queryParams.join("&");
-
-        const response=await axios.get(link,{withCredentials:true});
+        
+        const queryString = searchParams.toString();
+        const link = `http://localhost:4000/api/v1/job/getall${queryString ? `?${queryString}` : ''}`;
+        
+        const response = await axios.get(link, { withCredentials: true });
         dispatch(jobSlice.actions.successForAllJobs(response.data.jobs));
-        dispatch(jobSlice.actions.clearAllErrors());
     } catch (error) {
-        dispatch(jobSlice.actions.failureForAllJobs(error.response.data.message));
+        dispatch(jobSlice.actions.failureForAllJobs(
+            error.response?.data?.message || "An error occurred while fetching jobs"
+        ));
     }
 };
 
-export const clearAllErrors=()=>(dispatch)=>{
-    dispatch(jobSlice.actions.clearAllErrors())
-
-}
-export const resetJobSlice=()=>(dispatch)=>{
-    dispatch(jobSlice.actions.resetJobSlice())
-}
+export const { clearAllErrors, resetJobSlice } = jobSlice.actions;
 
 export default jobSlice.reducer;
