@@ -6,6 +6,6 @@ const router=Router();
 router.route("/postapplication/:id").post(verifyJWT,isAuthorized("Job Seeker"),postApplication);
 router.route("/employer/getapplication").get(verifyJWT,isAuthorized("Employer"),EmployerGetApplications);
 router.route("/jobseeker/getapplication").get(verifyJWT,isAuthorized("Job Seeker"),JobSeekerGetApplications);
-router.route("deleteapplication").get(verifyJWT,deleteApplication);
+router.route("/deleteapplication/:id").delete(verifyJWT,deleteApplication);
 
 export default router;

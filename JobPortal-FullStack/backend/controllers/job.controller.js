@@ -137,7 +137,7 @@ const getAllJobs = catchAsyncErrors(async (req, res, next) => {
     }
     if (searchKeyword) {
       query.$or = [
-        { title: { $regex: searchKeyword, $options: "i" } },
+        { title: { $regex: searchKeyword, $options: "i" } },    // i makes the case insensitive
         { companyName: { $regex: searchKeyword, $options: "i" } },
         { introduction: { $regex: searchKeyword, $options: "i" } },
       ];

@@ -125,6 +125,8 @@ const JobSeekerGetApplications = catchAsyncErrors(async (req, res, next) => {
 const deleteApplication = catchAsyncErrors(async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log(id)
+    console.log(req.user.role);
     const application = await Application.findById(id);
     if (!application) {
       return next(new ErrorHandler("Application not found.", 404));
