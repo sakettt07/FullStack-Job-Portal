@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearAllErrors, fetchJobs } from "../store/slices/jobSlices";
+import { clearAllJobErrors, fetchJobs } from "../store/slices/jobSlices";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
 import { cityData, jobPositions } from "../assets/data.js";
@@ -47,7 +47,7 @@ const Jobs = () => {
   useEffect(() => {
     if (error) {
       toast.error(error);
-      dispatch(clearAllErrors());
+      dispatch(clearAllJobErrors());
     }
     dispatch(fetchJobs(city, niche, debouncedSearchTerm));
   }, [dispatch, error, city, niche, debouncedSearchTerm]);
@@ -281,3 +281,5 @@ const Jobs = () => {
 };
 
 export default Jobs;
+
+// http://localhost:4000/api/v1/job/getall
